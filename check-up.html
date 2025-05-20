@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediCare - Disease Check-up</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
         :root {
             --primary-color: #0077be;
@@ -217,110 +217,6 @@
             margin-bottom: 1rem;
         }
 
-        /* Navigation bar */
-        .navbar {
-            background-color: var(--white);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-
-        .nav-links li {
-            margin-left: 2rem;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary-color);
-        }
-
-        /* User menu */
-        .user-menu {
-            position: relative;
-            cursor: pointer;
-        }
-
-        .user-name {
-            display: flex;
-            align-items: center;
-        }
-
-        .user-name i {
-            margin-right: 5px;
-        }
-
-        .user-dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-radius: 5px;
-            width: 180px;
-            z-index: 1000;
-        }
-
-        .user-dropdown.active {
-            display: block;
-        }
-
-        .user-dropdown a {
-            display: block;
-            padding: 10px 15px;
-            text-decoration: none;
-            color: var(--text-color);
-            transition: all 0.3s ease;
-        }
-
-        .user-dropdown a:hover {
-            background-color: rgba(255, 99, 71, 0.1);
-        }
-
-        /* Loading spinner */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: var(--white);
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.5rem;
@@ -342,10 +238,6 @@
             .btn {
                 padding: 0.6rem 1.2rem;
                 font-size: 0.8rem;
-            }
-
-            .nav-links {
-                display: none;
             }
         }
 
@@ -436,6 +328,16 @@
                     <p>Fast Relief for Everyday Ailments – Headache, Fever, and More!</p>
                     <a href="medicine-suggetions.html" class="btn" onclick="openModal('General Disease')">Get Medicine</a>
                 </div>
+            </div>
+            <div class="disease-card">
+                <img src="https://i.ibb.co/yDHRC16/image.png" alt="live check-up">
+                <div class="disease-info">
+                    <i class="fas fa-stethoscope icon" style="color: rgb(162, 0, 0);"></i>
+                        <h3>Live check-up</h3>
+                        <p>Get real-time health insights anytime with our Live Check-Up feature</p>
+                     <a href="health-predict.html" class="btn" onclick="openModal('health predict')">Request Check-up</a>
+                 </div>
+
             </div>
         </div>
     </div>
