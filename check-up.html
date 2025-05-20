@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare - Disease Check-up</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary-color: #0077be;
+            --secondary-color: #ff6347;
+            --accent-color: #a80000;
+            --background-color: #f0f8ff;
+            --text-color: #333;
+            --white: #fff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 2rem 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: var(--white);
+            text-align: center;
+            padding: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="5"/></svg>') repeat;
+            animation: rotate 60s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .disease-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .disease-card {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .disease-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .disease-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--accent-color);
+        }
+
+        .disease-info {
+            padding: 1.5rem;
+        }
+
+        .disease-info h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.4rem;
+        }
+
+        .disease-info p {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            color: #666;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background-color: var(--accent-color);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #checkupModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.5s;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: var(--primary-color);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form input {
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        form button {
+            padding: 0.8rem;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        form button:hover {
+            background-color: var(--accent-color);
+        }
+
+        .icon {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Navigation bar */
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* User menu */
+        .user-menu {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-name {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-name i {
+            margin-right: 5px;
+        }
+
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            width: 180px;
+            z-index: 1000;
+        }
+
+        .user-dropdown.active {
+            display: block;
+        }
+
+        .user-dropdown a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown a:hover {
+            background-color: rgba(255, 99, 71, 0.1);
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .disease-card {
+                max-width: 350px;
+                margin: 0 auto;
+            }
+
+            .disease-info h3 {
+                font-size: 1.2rem;
+            }
+
+            .btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.8rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .disease-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .icon {
+                font-size: 2rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">MediCare</a>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#features">Features</a></li>
+                <li id="auth-link"><a href="Register.html">Register</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header>
+        <h1>MediCare Check-up Center</h1>
+        <p class="subtitle">Empowering your health with advanced software-based disease detection</p>
+    </header>
+
+    <div class="container">
+        <div class="disease-grid">
+            <div class="disease-card">
+                <img src="https://i.ibb.co/MkjQG9f0/image.png" alt="Skin Conditions">
+                <div class="disease-info">
+                    <i class="fas fa-allergies icon"></i>
+                    <h3>Skin Conditions</h3></a>
+                    <p>Early Detection of Skin Diseases with MediCare Image Analysis</p>
+                    <a href="#" class="btn" onclick="openModal('Skin Conditions')">Request Check-up</a>
+                </div>
+            </div>
+            <div class="disease-card">
+                <img src="https://i.ibb.co/BKVkfCPx/image.png" alt="Eye Problems">
+                <div class="disease-info">
+                    <i class="fas fa-eye icon"></i>
+                    <h3>Eye Problems</h3>
+                    <p>Comprehensive Eye Exams for Early Detection with MediCare Retinal Imaging</p>
+                    <a href="#" class="btn" onclick="openModal('Eye Problems')">Request Check-up</a>
+                </div>
+            </div>
+            <div class="disease-card">
+                <img src="https://i.ibb.co/bRstJp5X/image.png" alt="Cardiovascular Diseases">
+                <div class="disease-info">
+                    <i class="fas fa-heartbeat icon"></i>
+                    <h3>Predict My Health Report</h3>
+                    <p>Upload Your Report and Discover What's Next for Your Health </p>
+                    <a href="#" class="btn" onclick="openModal('Health Report Analysis')">Predict My Health</a>
+                </div>
+            </div>
+            <div class="disease-card">
+                <img src="https://i.ibb.co/NgMHV6tJ/image.png" alt="Diabetes">
+                <div class="disease-info">
+                    <i class="fas fa-tint icon"></i>
+                    <h3>Diabetes</h3>
+                    <p>Estimate Your Blood Sugar & Assess Diabetes Risk with MediCare</p>
+                    <a href="#" class="btn" onclick="openModal('Diabetes')">Request Check-up</a>
+                </div>
+            </div>
+            <div class="disease-card">
+                <img src="https://i.ibb.co/F4fc1chS/De-Watermark-ai-1738512847302.png" alt="Respiratory Diseases">
+                <div class="disease-info">
+                    <i class="fas fa-lungs icon"></i>
+                    <h3>General Disease</h3>
+                    <p>Fast Relief for Everyday Ailments – Headache, Fever, and More!</p>
+                    <a href="medicine-suggetions.html" class="btn" onclick="openModal('General Disease')">Get Medicine</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="checkupModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Request Software Check-up</h2>
+            <form id="checkupForm">
+                <input type="text" id="name" placeholder="Your Name" required>
+                <input type="email" id="email" placeholder="Your Email" required>
+                <input type="tel" id="phone" placeholder="Your Phone Number" required>
+                <input type="hidden" id="diseaseType">
+                <button type="submit" id="submitBtn">
+                    <span id="submitText">Request Check-up</span>
+                    <span id="loadingSpinner" class="loading-spinner" style="display: none;"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById("checkupModal");
+        const closeBtn = document.getElementsByClassName("close")[0];
+        const checkupForm = document.getElementById("checkupForm");
+        const diseaseTypeInput = document.getElementById("diseaseType");
+        const submitBtn = document.getElementById("submitBtn");
+        const submitText = document.getElementById("submitText");
+        const loadingSpinner = document.getElementById("loadingSpinner");
+        let currentUser = null;
+
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const userString = sessionStorage.getItem('user');
+            const authLinkElement = document.getElementById('auth-link');
+            
+            if (userString) {
+                // User is logged in
+                currentUser = JSON.parse(userString);
+                
+                // Create user menu with dropdown
+                const userMenu = document.createElement('div');
+                userMenu.className = 'user-menu';
+                
+                const userName = document.createElement('div');
+                userName.className = 'user-name';
+                userName.innerHTML = `<i class="fas fa-user"></i> ${currentUser.name} <i class="fas fa-chevron-down"></i>`;
+                
+                const userDropdown = document.createElement('div');
+                userDropdown.className = 'user-dropdown';
+                
+                // Add dashboard link based on user role
+                const dashboardLink = document.createElement('a');
+                const dashboardUrl = `dashboard-${currentUser.role}.html`;
+                dashboardLink.href = dashboardUrl;
+                dashboardLink.innerHTML = '<i class="fas fa-tachometer-alt"></i> Dashboard';
+                
+                const logoutLink = document.createElement('a');
+                logoutLink.href = '#';
+                logoutLink.id = 'logout-link';
+                logoutLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                
+                userDropdown.appendChild(dashboardLink);
+                userDropdown.appendChild(logoutLink);
+                
+                userMenu.appendChild(userName);
+                userMenu.appendChild(userDropdown);
+                
+                // Replace the auth link with user menu
+                authLinkElement.innerHTML = '';
+                authLinkElement.appendChild(userMenu);
+                
+                // Toggle dropdown on click
+                userName.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('active');
+                });
+                
+                // Handle logout
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Clear session storage
+                    sessionStorage.removeItem('user');
+                    // Reload the page to update the UI
+                    window.location.reload();
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userMenu.contains(e.target)) {
+                        userDropdown.classList.remove('active');
+                    }
+                });
+            } else {
+                // User is not logged in, ensure the Register link is shown
+                authLinkElement.innerHTML = '<a href="Register.html">Register</a>';
+            }
+        });
+
+        function openModal(diseaseType) {
+            // Check if user is logged in
+            if (!currentUser) {
+                alert('Please log in to request a check-up.');
+                window.location.href = 'Register.html';
+                return;
+            }
+            
+            modal.style.display = "block";
+            diseaseTypeInput.value = diseaseType;
+            
+            // Pre-fill form with user data
+            document.getElementById("name").value = currentUser.name;
+            document.getElementById("email").value = currentUser.email;
+        }
+
+        closeBtn.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        checkupForm.onsubmit = function(e) {
+            e.preventDefault();
+            
+            // Check if user is logged in
+            if (!currentUser) {
+                alert('Please log in to request a check-up.');
+                window.location.href = 'Register.html';
+                return;
+            }
+            
+            // Show loading spinner
+            submitText.style.display = 'none';
+            loadingSpinner.style.display = 'inline-block';
+            submitBtn.disabled = true;
+            
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const phone = document.getElementById("phone").value;
+            const diseaseType = diseaseTypeInput.value;
+            
+            // Send data to server
+            fetch('/api/checkup-request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: currentUser.id,
+                    name,
+                    email,
+                    phone,
+                    diseaseType
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Thank you, ${name}! Your software-based check-up request for ${diseaseType} has been received. We'll send instructions to ${email} on how to proceed with the online check-up. If needed, we may contact you at ${phone}.`);
+                    modal.style.display = "none";
+                    checkupForm.reset();
+                } else {
+                    alert('Error submitting check-up request. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error submitting check-up request. Please try again.');
+            })
+            .finally(() => {
+                // Hide loading spinner
+                submitText.style.display = 'inline-block';
+                loadingSpinner.style.display = 'none';
+                submitBtn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare - Login & Signup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary-color: #7b0000;
+            --secondary-color: #ff6347;
+            --background-color: #f0f8ff;
+            --text-color: #333;
+            --white: #fff;
+            --error-color: #ff3333;
+            --success-color: #28a745;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 0;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Main Content Styles */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 0;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 2rem auto;
+            display: flex;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            background: var(--white);
+        }
+
+        .auth-image {
+            flex: 1;
+            background: url('https://i.ibb.co/1fDBbkGL/image.png') no-repeat center center/cover;
+            position: relative;
+            min-height: 500px;
+        }
+
+        .auth-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(176, 0, 0, 0.7), rgba(0, 0, 0, 0.7));
+        }
+
+        .auth-image-content {
+            position: relative;
+            z-index: 1;
+            color: var(--white);
+            padding: 2rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-image-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .auth-image-content p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .auth-form {
+            flex: 1;
+            padding: 2rem;
+            background: var(--white);
+        }
+
+        .form-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(255, 99, 71, 0.2);
+            outline: none;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .form-check input {
+            margin-right: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            background: #ff4500;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .form-footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .form-footer a:hover {
+            color: var(--primary-color);
+        }
+
+        .role-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.2rem;
+        }
+
+        .role-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .role-option:hover {
+            background-color: rgba(255, 99, 71, 0.1);
+        }
+
+        .role-option.active {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border-color: var(--secondary-color);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .form-message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .form-message.error {
+            background-color: rgba(255, 51, 51, 0.1);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .form-message.success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 1rem;
+        }
+
+        .forgot-password a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-form {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Footer Styles */
+        footer {
+            background: #333;
+            color: var(--white);
+            padding: 1.5rem 0;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+
+            .auth-container {
+                flex-direction: column;
+                max-width: 500px;
+            }
+
+            .auth-image {
+                min-height: 200px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .role-selector {
+                flex-direction: column;
+            }
+
+            .role-option {
+                margin: 5px 0;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="index.html" class="logo">MediCare</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="#" class="active">Login/Register</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="auth-container">
+            <div class="auth-image">
+                <div class="auth-image-content">
+                    <h2>Your Health, Our Priority</h2>
+                    <p>Join MediCare today and experience healthcare like never before. Our platform connects you with the best healthcare professionals and services.</p>
+                </div>
+            </div>
+            <div class="auth-form">
+                <!-- Login Form -->
+                <div id="login-form">
+                    <h2 class="form-title">Login to Your Account</h2>
+                    <div class="form-message" id="login-message"></div>
+                    
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" class="form-control" placeholder="Enter your email" required>
+                            <div class="error-message" id="login-email-error"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required>
+                            <div class="error-message" id="login-password-error"></div>
+                        </div>
+                        
+                        <div class="forgot-password">
+                            <a href="#" id="forgot-password-link">Forgot Password?</a>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Select Role</label>
+                            <div class="role-selector">
+                                <div class="role-option active" data-role="patient">
+                                    <i class="fas fa-user"></i> Patient
+                                </div>
+                                <div class="role-option" data-role="doctor">
+                                    <i class="fas fa-user-md"></i> Doctor
+                                </div>
+                                <div class="role-option" data-role="admin">
+                                    <i class="fas fa-user-shield"></i> Admin
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="btn-container">
+                            <button type="submit" class="btn" id="login-btn">Login</button>
+                            <div class="spinner" id="login-spinner"></div>
+                        </div>
+                    </form>
+                    
+                    <div class="form-footer">
+                        <p>Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
+                    </div>
+                </div>
+                
+                <!-- Signup Form -->
+                <div id="signup-form" style="display: none;">
+                    <h2 class="form-title">Create an Account</h2>
+                    <div class="form-message" id="signup-message"></div>
+                    
+                    <form id="signupForm">
+                        <div class="form-group">
+                            <label for="fullname">Full Name</label>
+                            <input type="text" id="fullname" class="form-control" placeholder="Enter your full name" required>
+                            <div class="error-message" id="fullname-error"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                            <div class="error-message" id="email-error"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number" required>
+                            <div class="error-message" id="phone-error"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" class="form-control" placeholder="Create a password" required>
+                            <div class="error-message" id="password-error"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirm-password">Confirm Password</label>
+                            <input type="password" id="confirm-password" class="form-control" placeholder="Confirm your password" required>
+                            <div class="error-message" id="confirm-password-error"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Select Role</label>
+                            <div class="role-selector">
+                                <div class="role-option active" data-role="patient">
+                                    <i class="fas fa-user"></i> Patient
+                                </div>
+                                <div class="role-option" data-role="doctor">
+                                    <i class="fas fa-user-md"></i> Doctor
+                                </div>
+                                <div class="role-option" data-role="admin">
+                                    <i class="fas fa-user-shield"></i> Admin
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input type="checkbox" id="terms" required>
+                            <label for="terms">I accept the Terms & Conditions</label>
+                        </div>
+                        
+                        <div class="btn-container">
+                            <button type="submit" class="btn" id="signup-btn">Sign Up</button>
+                            <div class="spinner" id="signup-spinner"></div>
+                        </div>
+                    </form>
+                    
+                    <div class="form-footer">
+                        <p>Already have an account? <a href="#" id="show-login">Login</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 MediCare. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const showSignupLink = document.getElementById('show-signup');
+        const showLoginLink = document.getElementById('show-login');
+        const loginFormEl = document.getElementById('loginForm');
+        const signupFormEl = document.getElementById('signupForm');
+        const loginMessage = document.getElementById('login-message');
+        const signupMessage = document.getElementById('signup-message');
+        const loginSpinner = document.getElementById('login-spinner');
+        const signupSpinner = document.getElementById('signup-spinner');
+
+        // API URL - Change this to your server URL when deployed
+        const API_URL = 'http://localhost:3000/api';
+
+        // Toggle between login and signup forms
+        showSignupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.style.display = 'none';
+            signupForm.style.display = 'block';
+        });
+
+        showLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            signupForm.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+
+        // Role selector functionality
+        document.querySelectorAll('.role-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Find the parent role-selector
+                const roleSelector = this.parentElement;
+                
+                // Remove active class from all options in this selector
+                roleSelector.querySelectorAll('.role-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                
+                // Add active class to clicked option
+                this.classList.add('active');
+            });
+        });
+
+        // Form validation functions
+        function validateEmail(email) {
+            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
+        }
+
+        function validatePassword(password) {
+            // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
+            const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            return re.test(password);
+        }
+
+        function validatePhone(phone) {
+            const re = /^\d{10}$/;
+            return re.test(phone);
+        }
+
+        function showError(inputId, message) {
+            const errorElement = document.getElementById(`${inputId}-error`);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            document.getElementById(inputId).classList.add('error');
+        }
+
+        function clearError(inputId) {
+            const errorElement = document.getElementById(`${inputId}-error`);
+            if (errorElement) {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+            const inputElement = document.getElementById(inputId);
+            if (inputElement) {
+                inputElement.classList.remove('error');
+            }
+        }
+
+        function showFormMessage(formId, type, message) {
+            const messageElement = document.getElementById(`${formId}-message`);
+            messageElement.textContent = message;
+            messageElement.className = `form-message ${type}`;
+            messageElement.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 5000);
+        }
+
+        // Login form validation and submission
+        loginFormEl.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Clear previous errors
+            clearError('login-email');
+            clearError('login-password');
+            
+            // Get form values
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const role = document.querySelector('#login-form .role-option.active').dataset.role;
+            
+            // Validate email
+            if (!validateEmail(email)) {
+                showError('login-email', 'Please enter a valid email address');
+                return;
+            }
+            
+            // Validate password (simple check for login)
+            if (password.length < 8) {
+                showError('login-password', 'Password must be at least 8 characters');
+                return;
+            }
+            
+            // Show spinner
+            loginSpinner.style.display = 'inline-block';
+            document.getElementById('login-btn').disabled = true;
+            
+            try {
+                // For client-side testing without a server
+                // Simulate successful login
+                const mockUser = {
+                    name: "Test User",
+                    email: email,
+                    role: role
+                };
+                
+                // Save user data to session storage
+                sessionStorage.setItem('user', JSON.stringify(mockUser));
+                
+                showFormMessage('login', 'success', 'Login successful! Redirecting...');
+                
+                // Redirect based on role - FIX: Use absolute path with leading slash
+                setTimeout(() => {
+                    // Check if dashboard file exists in the same directory
+                    const dashboardFile = `dashboard-${role}.html`;
+                    
+                    // Create a temporary link to check if the file exists
+                    const tempLink = document.createElement('a');
+                    tempLink.href = dashboardFile;
+                    
+                    // Get the absolute URL
+                    const absoluteUrl = tempLink.href;
+                    
+                    // Redirect to the dashboard
+                    window.location.href = dashboardFile;
+                }, 1500);
+                
+                /* Uncomment this for server-side authentication
+                // Send login request to server
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password, role })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Save user data to session storage
+                    sessionStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    showFormMessage('login', 'success', data.message || 'Login successful! Redirecting...');
+                    
+                    // Redirect based on role
+                    setTimeout(() => {
+                        window.location.href = `dashboard-${role}.html`;
+                    }, 1500);
+                } else {
+                    showFormMessage('login', 'error', data.message || 'Login failed');
+                }
+                */
+            } catch (error) {
+                showFormMessage('login', 'error', 'An error occurred. Please try again.');
+                console.error('Login error:', error);
+            } finally {
+                // Hide spinner
+                loginSpinner.style.display = 'none';
+                document.getElementById('login-btn').disabled = false;
+            }
+        });
+
+        // Signup form validation and submission
+        signupFormEl.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Clear previous errors
+            clearError('fullname');
+            clearError('email');
+            clearError('phone');
+            clearError('password');
+            clearError('confirm-password');
+            
+            // Get form values
+            const fullname = document.getElementById('fullname').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const role = document.querySelector('#signup-form .role-option.active').dataset.role;
+            const termsAccepted = document.getElementById('terms').checked;
+            
+            // Validate full name
+            if (fullname.length < 3) {
+                showError('fullname', 'Name must be at least 3 characters');
+                return;
+            }
+            
+            // Validate email
+            if (!validateEmail(email)) {
+                showError('email', 'Please enter a valid email address');
+                return;
+            }
+            
+            // Validate phone
+            if (!validatePhone(phone)) {
+                showError('phone', 'Please enter a valid 10-digit phone number');
+                return;
+            }
+            
+            // Validate password
+            if (!validatePassword(password)) {
+                showError('password', 'Password must be at least 8 characters with 1 uppercase, 1 lowercase, 1 number, and 1 special character');
+                return;
+            }
+            
+            // Validate confirm password
+            if (password !== confirmPassword) {
+                showError('confirm-password', 'Passwords do not match');
+                return;
+            }
+            
+            // Validate terms acceptance
+            if (!termsAccepted) {
+                showFormMessage('signup', 'error', 'You must accept the Terms & Conditions');
+                return;
+            }
+            
+            // Show spinner
+            signupSpinner.style.display = 'inline-block';
+            document.getElementById('signup-btn').disabled = true;
+            
+            try {
+                // For client-side testing without a server
+                // Simulate successful signup
+                const mockUser = {
+                    name: fullname,
+                    email: email,
+                    role: role
+                };
+                
+                // Save user data to session storage
+                sessionStorage.setItem('user', JSON.stringify(mockUser));
+                
+                showFormMessage('signup', 'success', 'Account created successfully! Redirecting...');
+                
+                // Redirect based on role - FIX: Use absolute path with leading slash
+                setTimeout(() => {
+                    // Check if dashboard file exists in the same directory
+                    const dashboardFile = `dashboard-${role}.html`;
+                    
+                    // Redirect to the dashboard
+                    window.location.href = dashboardFile;
+                }, 1500);
+                
+                /* Uncomment this for server-side authentication
+                // Send signup request to server
+                const response = await fetch(`${API_URL}/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ fullname, email, phone, password, role })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Save user data to session storage
+                    sessionStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    showFormMessage('signup', 'success', data.message || 'Account created successfully! Redirecting...');
+                    
+                    // Redirect based on role
+                    setTimeout(() => {
+                        window.location.href = `dashboard-${role}.html`;
+                    }, 1500);
+                } else {
+                    showFormMessage('signup', 'error', data.message || 'Registration failed');
+                }
+                */
+            } catch (error) {
+                showFormMessage('signup', 'error', 'An error occurred. Please try again.');
+                console.error('Signup error:', error);
+            } finally {
+                // Hide spinner
+                signupSpinner.style.display = 'none';
+                document.getElementById('signup-btn').disabled = false;
+            }
+        });
+
+        // Forgot password functionality
+        document.getElementById('forgot-password-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            const email = prompt('Please enter your email address to reset your password:');
+            
+            if (email && validateEmail(email)) {
+                alert(`If an account exists for ${email}, a password reset link will be sent.`);
+                // In a real application, you would send a request to the server to handle password reset
+            } else if (email) {
+                alert('Please enter a valid email address.');
+            }
+        });
+    </script>
+</body>
+</html>

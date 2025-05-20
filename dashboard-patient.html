@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard - MediCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary-color: #7b0000;
+            --secondary-color: #ff6347;
+            --background-color: #f0f8ff;
+            --text-color: #333;
+            --white: #fff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 0;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: flex;
+            margin-top: 2rem;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-right: 2rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-menu a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(255, 99, 71, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .sidebar-menu a i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-message h1 {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .welcome-message p {
+            color: #666;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--white);
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
+        .user-details h3 {
+            font-size: 1.2rem;
+        }
+
+        .user-details p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 99, 71, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--secondary-color);
+        }
+
+        .card-content {
+            text-align: center;
+        }
+
+        .card-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-label {
+            color: #666;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            background: #ff4500;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .logout-btn {
+            background-color: #f44336;
+        }
+
+        /* Footer Styles */
+        footer {
+            background: #333;
+            color: var(--white);
+            padding: 1.5rem 0;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+
+            .dashboard {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* Loading spinner */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .loading:after {
+            content: " ";
+            display: block;
+            width: 40px;
+            height: 40px;
+            margin: 8px;
+            border-radius: 50%;
+            border: 6px solid var(--secondary-color);
+            border-color: var(--secondary-color) transparent var(--secondary-color) transparent;
+            animation: loading 1.2s linear infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Recent activity section */
+        .recent-activity {
+            margin-top: 2rem;
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 99, 71, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--secondary-color);
+            margin-right: 1rem;
+        }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-date {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .activity-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-scheduled {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-completed {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-pending {
+            background-color: #fff8e1;
+            color: #ffa000;
+        }
+
+        .status-active {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-cancelled {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="index.html" class="logo">MediCare</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#" class="active">Dashboard</a></li>
+                <li><a href="#" id="logout-link">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="dashboard">
+            <div class="sidebar">
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#" id="appointments-link"><i class="fas fa-calendar-alt"></i> Appointments</a></li>
+                    <li><a href="#" id="records-link"><i class="fas fa-file-medical"></i> Medical Records</a></li>
+                    <li><a href="#" id="prescriptions-link"><i class="fas fa-pills"></i> Prescriptions</a></li>
+                    <li><a href="check-up.html"><i class="fas fa-user-md"></i> Find Doctor</a></li>
+                    <li><a href="#" id="settings-link"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </div>
+            <div class="main-content">
+                <div class="dashboard-header">
+                    <div class="welcome-message">
+                        <h1>Welcome, <span id="user-name">Patient</span></h1>
+                        <p>Here's what's happening with your health today.</p>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-details">
+                            <h3 id="user-full-name">Patient Name</h3>
+                            <p id="user-email">patient@example.com</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="dashboard-loading" class="loading"></div>
+                <div id="dashboard-content" style="display: none;">
+                    <div class="dashboard-cards">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Upcoming Appointments</h3>
+                                <div class="card-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-value" id="appointments-count">0</div>
+                                <div class="card-label">Scheduled</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Prescriptions</h3>
+                                <div class="card-icon">
+                                    <i class="fas fa-prescription-bottle-alt"></i>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-value" id="prescriptions-count">0</div>
+                                <div class="card-label">Active</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Medical Records</h3>
+                                <div class="card-icon">
+                                    <i class="fas fa-file-medical-alt"></i>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-value" id="records-count">0</div>
+                                <div class="card-label">Documents</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Quick Actions</h3>
+                        </div>
+                        <div class="card-content" style="text-align: left;">
+                            <button class="btn" style="margin-right: 10px;" id="book-appointment-btn"><i class="fas fa-calendar-plus"></i> Book Appointment</button>
+                            <button class="btn" style="margin-right: 10px;" id="request-consultation-btn"><i class="fas fa-comment-medical"></i> Request Consultation</button>
+                            <button class="btn" id="emergency-btn"><i class="fas fa-ambulance"></i> Emergency</button>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity Section -->
+                    <div class="recent-activity">
+                        <h2>Recent Activity</h2>
+                        <div id="recent-appointments" class="activity-section">
+                            <h3>Appointments</h3>
+                            <ul class="activity-list" id="appointments-list">
+                                <!-- Appointments will be loaded here -->
+                                <div class="no-data">No recent appointments</div>
+                            </ul>
+                        </div>
+                        
+                        <div id="recent-checkups" class="activity-section">
+                            <h3>Check-up Requests</h3>
+                            <ul class="activity-list" id="checkups-list">
+                                <!-- Check-up requests will be loaded here -->
+                                <div class="no-data">No recent check-up requests</div>
+                            </ul>
+                        </div>
+                        
+                        <div id="recent-emergencies" class="activity-section">
+                            <h3>Emergency Requests</h3>
+                            <ul class="activity-list" id="emergencies-list">
+                                <!-- Emergency requests will be loaded here -->
+                                <div class="no-data">No recent emergency requests</div>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 MediCare. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const userString = sessionStorage.getItem('user');
+            
+            if (!userString) {
+                // Redirect to login page if not logged in
+                window.location.href = 'Register.html';
+                return;
+            }
+            
+            const user = JSON.parse(userString);
+            
+            // Update user information on the page
+            document.getElementById('user-name').textContent = user.name.split(' ')[0];
+            document.getElementById('user-full-name').textContent = user.name;
+            document.getElementById('user-email').textContent = user.email;
+            
+            // Fetch dashboard data from the server
+            fetchDashboardData(user.id);
+            
+            // Handle logout
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                // Clear session storage
+                sessionStorage.removeItem('user');
+                // Redirect to home page
+                window.location.href = 'index.html';
+            });
+
+            // Handle quick action buttons
+            document.getElementById('book-appointment-btn').addEventListener('click', function() {
+                // Redirect to appointment booking page or show modal
+                alert('Appointment booking feature will be implemented soon!');
+            });
+
+            document.getElementById('request-consultation-btn').addEventListener('click', function() {
+                // Redirect to consultation request page or show modal
+                alert('Consultation request feature will be implemented soon!');
+            });
+
+            document.getElementById('emergency-btn').addEventListener('click', function() {
+                // Redirect to emergency page
+                window.location.href = 'emergency.html';
+            });
+
+            // Handle sidebar navigation
+            document.getElementById('appointments-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Appointments page will be implemented soon!');
+            });
+
+            document.getElementById('records-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Medical Records page will be implemented soon!');
+            });
+
+            document.getElementById('prescriptions-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Prescriptions page will be implemented soon!');
+            });
+
+            document.getElementById('settings-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Settings page will be implemented soon!');
+            });
+        });
+
+        // Fetch dashboard data from the server
+        function fetchDashboardData(userId) {
+            // Show loading spinner
+            document.getElementById('dashboard-loading').style.display = 'flex';
+            document.getElementById('dashboard-content').style.display = 'none';
+
+            // Fetch data from the server
+            fetch(`/api/dashboard/${userId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Update dashboard with the fetched data
+                        updateDashboard(data.data);
+                    } else {
+                        console.error('Error fetching dashboard data:', data.message);
+                        alert('Error loading dashboard data. Please try again later.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching dashboard data:', error);
+                    alert('Error loading dashboard data. Please try again later.');
+                })
+                .finally(() => {
+                    // Hide loading spinner
+                    document.getElementById('dashboard-loading').style.display = 'none';
+                    document.getElementById('dashboard-content').style.display = 'block';
+                });
+        }
+
+        // Update dashboard with fetched data
+        function updateDashboard(data) {
+            // Update counts
+            document.getElementById('appointments-count').textContent = data.appointments;
+            document.getElementById('prescriptions-count').textContent = data.prescriptions;
+            document.getElementById('records-count').textContent = data.medicalRecords;
+
+            // Update recent appointments
+            updateAppointmentsList(data.recentAppointments);
+            
+            // Update recent check-up requests
+            updateCheckupsList(data.checkupRequests);
+            
+            // Update recent emergency requests
+            updateEmergenciesList(data.emergencyRequests);
+        }
+
+        // Update appointments list
+        function updateAppointmentsList(appointments) {
+            const appointmentsList = document.getElementById('appointments-list');
+            
+            // Clear existing content
+            appointmentsList.innerHTML = '';
+            
+            if (appointments && appointments.length > 0) {
+                appointments.forEach(appointment => {
+                    const date = new Date(appointment.date);
+                    const formattedDate = date.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                    
+                    const li = document.createElement('li');
+                    li.className = 'activity-item';
+                    li.innerHTML = `
+                        <div class="activity-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-title">${appointment.reason}</div>
+                            <div class="activity-date">${formattedDate} at ${appointment.time}</div>
+                        </div>
+                        <span class="activity-status status-${appointment.status.toLowerCase()}">${appointment.status}</span>
+                    `;
+                    
+                    appointmentsList.appendChild(li);
+                });
+            } else {
+                appointmentsList.innerHTML = '<div class="no-data">No recent appointments</div>';
+            }
+        }
+
+        // Update check-ups list
+        function updateCheckupsList(checkups) {
+            const checkupsList = document.getElementById('checkups-list');
+            
+            // Clear existing content
+            checkupsList.innerHTML = '';
+            
+            if (checkups && checkups.length > 0) {
+                checkups.forEach(checkup => {
+                    const date = new Date(checkup.createdAt);
+                    const formattedDate = date.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                    
+                    const li = document.createElement('li');
+                    li.className = 'activity-item';
+                    li.innerHTML = `
+                        <div class="activity-icon">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-title">${checkup.diseaseType} Check-up</div>
+                            <div class="activity-date">Requested on ${formattedDate}</div>
+                        </div>
+                        <span class="activity-status status-${checkup.status.toLowerCase()}">${checkup.status}</span>
+                    `;
+                    
+                    checkupsList.appendChild(li);
+                });
+            } else {
+                checkupsList.innerHTML = '<div class="no-data">No recent check-up requests</div>';
+            }
+        }
+
+        // Update emergencies list
+        function updateEmergenciesList(emergencies) {
+            const emergenciesList = document.getElementById('emergencies-list');
+            
+            // Clear existing content
+            emergenciesList.innerHTML = '';
+            
+            if (emergencies && emergencies.length > 0) {
+                emergencies.forEach(emergency => {
+                    const date = new Date(emergency.createdAt);
+                    const formattedDate = date.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                    const formattedTime = date.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    const li = document.createElement('li');
+                    li.className = 'activity-item';
+                    li.innerHTML = `
+                        <div class="activity-icon">
+                            <i class="fas fa-ambulance"></i>
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-title">Emergency Request</div>
+                            <div class="activity-date">${formattedDate} at ${formattedTime}</div>
+                        </div>
+                        <span class="activity-status status-${emergency.status.toLowerCase()}">${emergency.status}</span>
+                    `;
+                    
+                    emergenciesList.appendChild(li);
+                });
+            } else {
+                emergenciesList.innerHTML = '<div class="no-data">No recent emergency requests</div>';
+            }
+        }
+    </script>
+</body>
+</html>

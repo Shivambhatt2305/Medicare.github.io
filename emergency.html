@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare - Emergency Services</title>
+    <!-- TomTom Maps SDK -->
+    <link rel='stylesheet' type='text/css' href='https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.23.0/maps/maps.css'>
+    <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.23.0/maps/maps-web.min.js"></script>
+    <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.23.0/services/services-web.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50c878;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --white: #fff;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .ambulance-details {
+            flex: 0 0 auto;
+            padding: 1rem;
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 40vh;
+        }
+
+        .map-container {
+            flex: 1;
+            position: relative;
+            min-height: 60vh;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ambulance-card {
+            background-color: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+        }
+
+        .ambulance-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .ambulance-card.selected {
+            border: 2px solid var(--primary-color);
+            background-color: #f0f7ff;
+        }
+
+        .ambulance-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .ambulance-card h2::before {
+            content: '🚑';
+            margin-right: 0.5rem;
+            font-size: 1.4rem;
+        }
+
+        .ambulance-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .ambulance-status {
+            font-weight: bold;
+            color: var(--secondary-color);
+            background-color: #e6f7ed;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+        }
+
+        .ambulance-status.en-route {
+            color: var(--warning-color);
+            background-color: #fef5e7;
+        }
+
+        .ambulance-eta {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .driver-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            background-color: #f0f4f8;
+            padding: 0.5rem;
+            border-radius: 10px;
+        }
+
+        .driver-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .contact-button, .emergency-button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-align: center;
+            flex: 1;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        .contact-button {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .emergency-button {
+            background-color: var(--danger-color);
+            color: var(--white);
+        }
+
+        .contact-button:hover {
+            background-color: #3a7bc8;
+            transform: translateY(-2px);
+        }
+
+        .emergency-button:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .map-overlay {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 0.75rem;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .map-overlay h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .map-overlay p {
+            margin-bottom: 0.3rem;
+        }
+
+        .map-controls {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .map-button {
+            background-color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .map-button:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .notification {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            z-index: 2000;
+            display: none;
+            animation: fadeInOut 3s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .driver-input-container {
+            background-color: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .driver-input-container h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .input-group button {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .input-group button:hover {
+            background-color: #3a7bc8;
+        }
+
+        /* Navigation bar */
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* User menu */
+        .user-menu {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-name {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-name i {
+            margin-right: 5px;
+        }
+
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            width: 180px;
+            z-index: 1000;
+        }
+
+        .user-dropdown.active {
+            display: block;
+        }
+
+        .user-dropdown a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown a:hover {
+            background-color: rgba(255, 99, 71, 0.1);
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row;
+            }
+
+            .ambulance-details {
+                flex: 0 0 350px;
+                height: 100vh;
+                max-height: none;
+                padding: 1.5rem;
+            }
+
+            .map-container {
+                flex: 1;
+                min-height: 100vh;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .ambulance-card {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .ambulance-card h2 {
+                font-size: 1.4rem;
+            }
+
+            .ambulance-info, .driver-info {
+                font-size: 1rem;
+            }
+
+            .driver-photo {
+                width: 50px;
+                height: 50px;
+            }
+
+            .contact-button, .emergency-button {
+                font-size: 1rem;
+            }
+
+            .map-overlay {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">MediCare</a>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#features">Features</a></li>
+                <li id="auth-link"><a href="Register.html">Register</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Getting your location...</p>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <div class="container">
+        <div class="ambulance-details">
+            <h1>Emergency Services</h1>
+            
+            <div class="driver-input-container">
+                <h3>Contact Driver Directly</h3>
+                <div class="input-group">
+                    <input type="text" id="driverNameInput" placeholder="Enter driver name">
+                    <button id="sendEmergencyBtn">Send Alert</button>
+                </div>
+                <p style="font-size: 0.8rem; color: #666;">This will send an emergency alert with your location</p>
+            </div>
+            
+            <div class="ambulance-card" data-id="1" data-lat="22.2500" data-lng="70.7500">
+                <h2>Ambulance #1</h2>
+                <div class="ambulance-info">
+                    <span class="ambulance-status en-route">En Route</span>
+                    <span class="ambulance-eta">ETA: 5 mins</span>
+                </div>
+                <div class="driver-info">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Driver" class="driver-photo">
+                    <div>
+                        <p><strong>John Doe</strong></p>
+                        <p>License: EMT-123456</p>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <a href="tel:+1234567890" class="contact-button">Call</a>
+                    <button class="emergency-button" data-driver="John Doe">Send Alert</button>
+                </div>
+            </div>
+            
+            <div class="ambulance-card" data-id="2" data-lat="22.3500" data-lng="70.8500">
+                <h2>Ambulance #2</h2>
+                <div class="ambulance-info">
+                    <span class="ambulance-status">Available</span>
+                    <span class="ambulance-eta">ETA: 8 mins</span>
+                </div>
+                <div class="driver-info">
+                    <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Driver" class="driver-photo">
+                    <div>
+                        <p><strong>Jane Smith</strong></p>
+                        <p>License: EMT-789012</p>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <a href="tel:+1987654321" class="contact-button">Call</a>
+                    <button class="emergency-button" data-driver="Jane Smith">Send Alert</button>
+                </div>
+            </div>
+            
+            <div class="ambulance-card" data-id="3" data-lat="22.4000" data-lng="70.9000">
+                <h2>Ambulance #3</h2>
+                <div class="ambulance-info">
+                    <span class="ambulance-status">Available</span>
+                    <span class="ambulance-eta">ETA: 12 mins</span>
+                </div>
+                <div class="driver-info">
+                    <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Driver" class="driver-photo">
+                    <div>
+                        <p><strong>Robert Johnson</strong></p>
+                        <p>License: EMT-456789</p>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <a href="tel:+1567891234" class="contact-button">Call</a>
+                    <button class="emergency-button" data-driver="Robert Johnson">Send Alert</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="map-overlay">
+                <h3>Your Location</h3>
+                <p><strong>Address:</strong> <span id="userAddress">Loading...</span></p>
+                <p><strong>Coordinates:</strong> <span id="coordinates">Loading...</span></p>
+            </div>
+            <div class="map-controls">
+                <button class="map-button" id="recenterBtn" title="Recenter Map">
+                    <i class="fas fa-crosshairs"></i>
+                </button>
+                <button class="map-button" id="trafficBtn" title="Toggle Traffic">
+                    <i class="fas fa-car"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let map;
+        let userMarker;
+        let userPosition = [70.8022, 22.3039]; // Default: Rajkot [lng, lat]
+        let selectedAmbulanceId = null;
+        let routeLayer = null;
+        let isTrafficVisible = false;
+        let watchId = null;
+        const apiKey = 'WPglpwBsq3RAlGQqJ8t4TkpRihGrspCI'; // TomTom API key
+        const ambulances = [
+            { id: 1, name: "Ambulance #1", driver: "John Doe", position: [70.7500, 22.2500] },
+            { id: 2, name: "Ambulance #2", driver: "Jane Smith", position: [70.8500, 22.3500] },
+            { id: 3, name: "Ambulance #3", driver: "Robert Johnson", position: [70.9000, 22.4000] }
+        ];
+        let currentUser = null;
+        
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const userString = sessionStorage.getItem('user');
+            const authLinkElement = document.getElementById('auth-link');
+            
+            if (userString) {
+                // User is logged in
+                currentUser = JSON.parse(userString);
+                
+                // Create user menu with dropdown
+                const userMenu = document.createElement('div');
+                userMenu.className = 'user-menu';
+                
+                const userName = document.createElement('div');
+                userName.className = 'user-name';
+                userName.innerHTML = `<i class="fas fa-user"></i> ${currentUser.name} <i class="fas fa-chevron-down"></i>`;
+                
+                const userDropdown = document.createElement('div');
+                userDropdown.className = 'user-dropdown';
+                
+                // Add dashboard link based on user role
+                const dashboardLink = document.createElement('a');
+                const dashboardUrl = `dashboard-${currentUser.role}.html`;
+                dashboardLink.href = dashboardUrl;
+                dashboardLink.innerHTML = '<i class="fas fa-tachometer-alt"></i> Dashboard';
+                
+                const logoutLink = document.createElement('a');
+                logoutLink.href = '#';
+                logoutLink.id = 'logout-link';
+                logoutLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                
+                userDropdown.appendChild(dashboardLink);
+                userDropdown.appendChild(logoutLink);
+                
+                userMenu.appendChild(userName);
+                userMenu.appendChild(userDropdown);
+                
+                // Replace the auth link with user menu
+                authLinkElement.innerHTML = '';
+                authLinkElement.appendChild(userMenu);
+                
+                // Toggle dropdown on click
+                userName.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('active');
+                });
+                
+                // Handle logout
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Clear session storage
+                    sessionStorage.removeItem('user');
+                    // Reload the page to update the UI
+                    window.location.reload();
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userMenu.contains(e.target)) {
+                        userDropdown.classList.remove('active');
+                    }
+                });
+            } else {
+                // User is not logged in, ensure the Register link is shown
+                authLinkElement.innerHTML = '<a href="Register.html">Register</a>';
+                
+                // Redirect to login page if not logged in
+                alert('Please log in to access emergency services.');
+                window.location.href = 'Register.html';
+                return;
+            }
+            
+            // Initialize the application
+            initializeApp();
+        });
+        
+        // Initialize the application
+        async function initializeApp() {
+            try {
+                // Get user's location
+                await getUserLocation();
+                
+                // Initialize map
+                initializeMap();
+                
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (error) {
+                console.error('Error initializing app:', error);
+                document.getElementById('loadingOverlay').style.display = 'none';
+                showNotification('Error getting your location. Using default location.');
+                
+                // Initialize with default location
+                initializeMap();
+                setupEventListeners();
+            }
+        }
+        
+        // Get user's location
+        function getUserLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Geolocation is not supported by your browser'));
+                    return;
+                }
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userPosition = [position.coords.longitude, position.coords.latitude];
+                        
+                        // Start watching position for live updates
+                        startWatchingPosition();
+                        
+                        // Reverse geocode to get address
+                        reverseGeocode(userPosition);
+                        
+                        resolve(userPosition);
+                    },
+                    (error) => {
+                        console.error('Error getting location:', error);
+                        reject(error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            });
+        }
+        
+        // Start watching user's position for live updates
+        function startWatchingPosition() {
+            if (navigator.geolocation) {
+                watchId = navigator.geolocation.watchPosition(
+                    (position) => {
+                        const newPosition = [position.coords.longitude, position.coords.latitude];
+                        
+                        // Update user position
+                        userPosition = newPosition;
+                        
+                        // Update user marker position
+                        if (userMarker) {
+                            userMarker.setLngLat(newPosition);
+                        }
+                        
+                        // Update coordinates display
+                        document.getElementById('coordinates').textContent = 
+                            `${position.coords.latitude.toFixed(4)}° N, ${position.coords.longitude.toFixed(4)}° E`;
+                        
+                        // If a route is displayed, update it
+                        if (selectedAmbulanceId !== null) {
+                            const selectedAmbulance = ambulances.find(a => a.id === selectedAmbulanceId);
+                            if (selectedAmbulance) {
+                                calculateAndDisplayRoute(selectedAmbulance.position, newPosition);
+                            }
+                        }
+                    },
+                    (error) => {
+                        console.error('Error watching position:', error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            }
+        }
+        
+        // Stop watching user's position
+        function stopWatchingPosition() {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+        }
+        
+        // Reverse geocode to get address from coordinates
+        function reverseGeocode(position) {
+            const url = `https://api.tomtom.com/search/2/reverseGeocode/${position[1]},${position[0]}.json?key=${apiKey}`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.addresses && data.addresses.length > 0) {
+                        const address = data.addresses[0].address;
+                        const formattedAddress = [
+                            address.streetName,
+                            address.municipalitySubdivision,
+                            address.municipality,
+                            address.countrySubdivision
+                        ].filter(Boolean).join(', ');
+                        
+                        document.getElementById('userAddress').textContent = formattedAddress;
+                    } else {
+                        document.getElementById('userAddress').textContent = 'Address not found';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error reverse geocoding:', error);
+                    document.getElementById('userAddress').textContent = 'Error getting address';
+                });
+        }
+        
+        // Initialize the map
+        function initializeMap() {
+            // Create map instance
+            map = tt.map({
+                key: apiKey,
+                container: 'map',
+                center: userPosition,
+                zoom: 13,
+                style: 'https://api.tomtom.com/style/1/style/22.2.1-9?map=basic_main&key=' + apiKey
+            });
+            
+            // Add user marker when map is loaded
+            map.on('load', function() {
+                // Add user marker
+                userMarker = new tt.Marker({
+                    color: '#4a90e2'
+                })
+                    .setLngLat(userPosition)
+                    .setPopup(new tt.Popup().setHTML('<strong>Your Location</strong>'))
+                    .addTo(map);
+                
+                // Add ambulance markers
+                ambulances.forEach(ambulance => {
+                    const marker = new tt.Marker({
+                        color: '#e74c3c'
+                    })
+                        .setLngLat(ambulance.position)
+                        .setPopup(new tt.Popup().setHTML(`<strong>${ambulance.name}</strong><br>Driver: ${ambulance.driver}`))
+                        .addTo(map);
+                });
+                
+                // Update coordinates display
+                document.getElementById('coordinates').textContent = 
+                    `${userPosition[1].toFixed(4)}° N, ${userPosition[0].toFixed(4)}° E`;
+            });
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Ambulance card click
+            document.querySelectorAll('.ambulance-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const ambulanceId = parseInt(this.dataset.id);
+                    const lat = parseFloat(this.dataset.lat);
+                    const lng = parseFloat(this.dataset.lng);
+                    
+                    // Remove selected class from all cards
+                    document.querySelectorAll('.ambulance-card').forEach(c => {
+                        c.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked card
+                    this.classList.add('selected');
+                    
+                    // Set selected ambulance
+                    selectedAmbulanceId = ambulanceId;
+                    
+                    // Calculate and display route
+                    const ambulancePosition = [lng, lat];
+                    calculateAndDisplayRoute(ambulancePosition, userPosition);
+                    
+                    // Show notification
+                    showNotification(`Route to ${this.querySelector('h2').textContent} calculated`);
+                });
+            });
+            
+            // Emergency buttons
+            document.querySelectorAll('.emergency-button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent card click
+                    const driverName = this.dataset.driver;
+                    sendEmergencyAlert(driverName);
+                });
+            });
+            
+            // Send emergency button
+            document.getElementById('sendEmergencyBtn').addEventListener('click', function() {
+                const driverName = document.getElementById('driverNameInput').value.trim();
+                if (driverName) {
+                    sendEmergencyAlert(driverName);
+                    document.getElementById('driverNameInput').value = '';
+                } else {
+                    showNotification('Please enter a driver name');
+                }
+            });
+            
+            // Recenter button
+            document.getElementById('recenterBtn').addEventListener('click', function() {
+                map.flyTo({
+                    center: userPosition,
+                    zoom: 13
+                });
+            });
+            
+            // Traffic button
+            document.getElementById('trafficBtn').addEventListener('click', function() {
+                toggleTraffic();
+            });
+        }
+        
+        // Calculate and display route between ambulance and user
+        function calculateAndDisplayRoute(start, end) {
+            // Remove existing route if any
+            if (map.getLayer('route')) {
+                map.removeLayer('route');
+            }
+            if (map.getSource('route')) {
+                map.removeSource('route');
+            }
+            
+            // Create routing service
+            const routingUrl = `https://api.tomtom.com/routing/1/calculateRoute/${start[1]},${start[0]}:${end[1]},${end[0]}/json?key=${apiKey}&traffic=true`;
+            
+            fetch(routingUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.routes && data.routes.length > 0) {
+                        const route = data.routes[0];
+                        const geometry = route.legs[0].points.map(point => [point.longitude, point.latitude]);
+                        
+                        const geojson = {
+                            type: 'Feature',
+                            properties: {},
+                            geometry: {
+                                type: 'LineString',
+                                coordinates: geometry
+                            }
+                        };
+                        
+                        // Add route to map
+                        map.addSource('route', {
+                            type: 'geojson',
+                            data: {
+                                type: 'FeatureCollection',
+                                features: [geojson]
+                            }
+                        });
+                        
+                        map.addLayer({
+                            id: 'route',
+                            type: 'line',
+                            source: 'route',
+                            layout: {
+                                'line-join': 'round',
+                                'line-cap': 'round'
+                            },
+                            paint: {
+                                'line-color': '#4a90e2',
+                                'line-width': 6,
+                                'line-opacity': 0.8
+                            }
+                        });
+                        
+                        // Fit map to show the entire route
+                        const bounds = new tt.LngLatBounds();
+                        geometry.forEach(function(coord) {
+                            bounds.extend(coord);
+                        });
+                        
+                        map.fitBounds(bounds, {
+                            padding: 50
+                        });
+                        
+                        // Update ETA
+                        const travelTimeMinutes = Math.ceil(route.summary.travelTimeInSeconds / 60);
+                        
+                        // Find the ambulance card and update ETA
+                        const ambulanceCard = document.querySelector(`.ambulance-card[data-id="${selectedAmbulanceId}"]`);
+                        if (ambulanceCard) {
+                            const etaElement = ambulanceCard.querySelector('.ambulance-eta');
+                            if (etaElement) {
+                                etaElement.textContent = `ETA: ${travelTimeMinutes} mins`;
+                            }
+                        }
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error calculating route:', error);
+                    showNotification('Error calculating route');
+                });
+        }
+        
+        // Toggle traffic flow layer
+        function toggleTraffic() {
+            if (isTrafficVisible) {
+                // Remove traffic layer
+                if (map.getLayer('traffic-flow')) {
+                    map.removeLayer('traffic-flow');
+                }
+                if (map.getSource('traffic-flow')) {
+                    map.removeSource('traffic-flow');
+                }
+                isTrafficVisible = false;
+                document.getElementById('trafficBtn').style.backgroundColor = '';
+                document.getElementById('trafficBtn').style.color = '';
+            } else {
+                // Add traffic layer
+                map.addSource('traffic-flow', {
+                    type: 'vector',
+                    url: 'https://api.tomtom.com/traffic/map/4/tile/flow/style.json?key=' + apiKey
+                });
+                
+                map.addLayer({
+                    id: 'traffic-flow',
+                    type: 'line',
+                    source: 'traffic-flow',
+                    'source-layer': 'flow',
+                    layout: {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    paint: {
+                        'line-width': 6,
+                        'line-color': [
+                            'match',
+                            ['get', 'traffic_level'],
+                            'low', '#4CAF50',
+                            'moderate', '#FFEB3B',
+                            'high', '#FF9800',
+                            'severe', '#F44336',
+                            '#4CAF50'
+                        ]
+                    }
+                });
+                
+                isTrafficVisible = true;
+                document.getElementById('trafficBtn').style.backgroundColor = '#4a90e2';
+                document.getElementById('trafficBtn').style.color = '#fff';
+            }
+            
+            showNotification(isTrafficVisible ? 'Traffic flow enabled' : 'Traffic flow disabled');
+        }
+        
+        // Send emergency alert to driver
+        function sendEmergencyAlert(driverName) {
+            // Check if user is logged in
+            if (!currentUser) {
+                alert('Please log in to send emergency alerts.');
+                window.location.href = 'Register.html';
+                return;
+            }
+            
+            // Get user's current position
+            const lat = userPosition[1];
+            const lng = userPosition[0];
+            const address = document.getElementById('userAddress').textContent;
+            
+            // Show notification
+            showNotification(`Sending emergency alert to ${driverName}...`);
+            
+            // Send emergency request to server
+            fetch('/api/emergency-request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: currentUser.id,
+                    latitude: lat,
+                    longitude: lng,
+                    address: address,
+                    driverName: driverName
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(`Emergency alert sent to ${driverName}`);
+                    
+                    // Select the ambulance card for this driver if it exists
+                    const driverCard = Array.from(document.querySelectorAll('.ambulance-card')).find(card => {
+                        const driverInfo = card.querySelector('.driver-info');
+                        return driverInfo && driverInfo.textContent.includes(driverName);
+                    });
+                    
+                    if (driverCard) {
+                        driverCard.click(); // Simulate click to select this ambulance
+                    }
+                } else {
+                    showNotification('Error sending emergency alert');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error sending emergency alert');
+            });
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Clean up when page is unloaded
+        window.addEventListener('beforeunload', function() {
+            stopWatchingPosition();
+        });
+    </script>
+</body>
+</html>
